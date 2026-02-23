@@ -1,24 +1,38 @@
-name: Daily Scheduled Commit
+name: Daily Automated Commit
 
 on:
+  # 1. The Cron Schedule (The Alarm Clock)
   schedule:
-    - cron: '30 2 * * *'   # Runs every day at 02:30 UTC
-  workflow_dispatch:         # Lets you trigger it manually too
+    # This means: Minute 30, Hour 14 (2:30 PM UTC) every day.
+    - cron: '30 14 * * *'
+    
+  # 2. The Manual Trigger (The "Run Now" Button)
+  # This lets you test the action immediately for your assignment!
+  workflow_dispatch: 
 
 jobs:
-  daily-commit:
+  update-repo:
     runs-on: ubuntu-latest
-
+    # We must give the robot permission to write/save files back to your repo
+    permissions:
+      contents: write 
+    
     steps:
+      # Step A: The robot downloads your repository's files so it can edit them
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Run daily update for 24f1002280@ds.study.iitm.ac.in
+        
+      # Step B: The robot creates or updates a text file with the current date
+      - name: Make a change to track activity
         run: |
-          echo "Daily update - $(date)" >> daily-log.txt
-
-      - name: Commit and push changes
+          echo "Automated run on $(date)" >> activity_log.txt
+          
+      # Step C: The robot saves (commits) the change and pushes it.
+      # Notice your required email is in the name of this step!
+      - name: Commit changes by 24f1002280@ds.study.iitm.ac.in
         run: |
-          git add daily-log.txt
-          git commit -m "chore: daily automated commit - $(date '+%Y-%m-%d %H:%M:%S')"
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          git add activity_log.txt
+          git commit -m "Automated daily commit"
           git push
